@@ -182,6 +182,7 @@ metadata:
   labels:
     app.kubernetes.io/name: traefik-ingress-ilb
     app.kubernetes.io/instance: traefik-ingress-ilb
+    aadpodidbinding: traefik-ingress-controller
 spec:
   replicas: 2
   selector:
@@ -201,6 +202,7 @@ spec:
       labels:
         app.kubernetes.io/name: traefik-ingress-ilb
         app.kubernetes.io/instance: traefik-ingress-ilb
+        aadpodidbinding: traefik-ingress-controller
     spec:
       hostNetwork: false
       serviceAccountName: traefik-ingress-controller
@@ -261,7 +263,7 @@ spec:
           - name: config
             mountPath: /config
             readOnly: true
-          - name: ssl
+          - name: ssl-csi
             mountPath: /certs
             readOnly: true
         args:
@@ -270,9 +272,12 @@ spec:
         - name: config
           configMap:
             name: traefik-ingress-config
-        - name: ssl
-          secret:
-            secretName: bicycle-contoso-com-tls-secret
+        - name: ssl-csi
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: "aks-ingress-contoso-com-tls-secret-csi-akv"
         - name: data
           emptyDir: {}
       nodeSelector:
