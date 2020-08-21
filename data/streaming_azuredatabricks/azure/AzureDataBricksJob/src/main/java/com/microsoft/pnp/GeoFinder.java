@@ -49,7 +49,7 @@ public class GeoFinder implements Serializable {
             try (FeatureIterator iterator = featureCollection.features()) {
                 if (iterator.hasNext()) {
                     Feature feature = iterator.next();
-                    return Optional.of(feature.getProperty("Name").getValue().toString());
+                    return Optional.of(feature.getProperty("NAME").getValue().toString());
                 }
             }
         } catch (IOException ex) {

@@ -55,11 +55,11 @@ A deployment for this reference architecture is available on [GitHub](https://gi
                     ...
     ```
 
-5. Open a web browser and navigate to https://www.zillow.com/howto/api/neighborhood-boundaries.htm. 
+5. Open a web browser and navigate to <https://www.census.gov/geographies/mapping-files/time-series/geo/cartographic-boundary.html#ti1400387013>. 
 
-6. Click on **New York Neighborhood Boundaries** to download the file.
+6. Under the section **County Subdivisions** click the dropdown an select **New York**.
 
-7. Copy the **ZillowNeighborhoods-NY.zip** file from your browser's **downloads** directory to the `DataFile` directory.
+7. Copy the **cb_2019_36_cousub_500k.zip** file from your browser's **downloads** directory to the `DataFile` directory.
 
 ### Deploy the Azure resources
 
@@ -195,7 +195,7 @@ Once executed, this command opens the vi editor. Enter the **secret** value from
 
 2. Navigate to data/streaming_azuredatabricks/DataFile and enter the following:
     ```bash
-    dbfs cp ZillowNeighborhoods-NY.zip dbfs:/azure-databricks-jobs
+    dbfs cp cb_2019_36_cousub_500k.zip dbfs:/azure-databricks-jobs
     ```
 
 ### Add the Azure Log Analytics workspace ID and primary key to configuration files
@@ -308,7 +308,7 @@ For this section, you require the Log Analytics workspace ID and primary key. Th
 6. In the arguments field, enter the following (replace **\<Cosmos DB Cassandra host name\>** with a value from above):
 
     ```
-    -n jar:file:/dbfs/azure-databricks-jobs/ZillowNeighborhoods-NY.zip!/ZillowNeighborhoods-NY.shp --taxi-ride-consumer-group taxi-ride-eh-cg --taxi-fare-consumer-group taxi-fare-eh-cg --window-interval "1 minute" --cassandra-host <Cosmos DB Cassandra host name>
+    -n jar:file:/dbfs/azure-databricks-jobs/cb_2019_36_cousub_500k.zip!/cb_2019_36_cousub_500k.shp --taxi-ride-consumer-group taxi-ride-eh-cg --taxi-fare-consumer-group taxi-fare-eh-cg --window-interval "1 minute" --cassandra-host <Cosmos DB Cassandra host name>
     ```
 
 7. Click **OK**.
