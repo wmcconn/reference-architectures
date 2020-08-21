@@ -28,8 +28,7 @@ A deployment for this reference architecture is available on [GitHub](https://gi
     - JDK 1.8
     - Scala SDK 2.11
     - Maven 3.6.3
-    > [!NOTE]
-    > Instructions are included for building via a docker container if you do not want to install a Java IDE.
+    > Note: Instructions are included for building via a docker container if you do not want to install a Java IDE.
 
 ### Download the New York City taxi and neighborhood data files
 
@@ -41,8 +40,7 @@ A deployment for this reference architecture is available on [GitHub](https://gi
 
 4. Extract the zip file to the `DataFile` directory.
 
-    > [!NOTE]
-    > This zip file contains other zip files. Don't extract the child zip files.
+    > Note: This zip file contains other zip files. Don't extract the child zip files.
 
     The directory structure should look like the following:
 
@@ -186,8 +184,7 @@ Once executed, this command opens the vi editor. Enter the **username** value fr
 
 Once executed, this command opens the vi editor. Enter the **secret** value from the **CosmosDb** output section in step 4 of the *deploy the Azure resources* section. Save and exit vi.
 
-> [!NOTE]
-> If using an [Azure Key Vault-backed secret scope](https://docs.azuredatabricks.net/user-guide/secrets/secret-scopes.html#azure-key-vault-backed-scopes), the scope must be named **azure-databricks-job** and the secrets must have the exact same names as those above.
+> Note: If using an [Azure Key Vault-backed secret scope](https://docs.azuredatabricks.net/user-guide/secrets/secret-scopes.html#azure-key-vault-backed-scopes), the scope must be named **azure-databricks-job** and the secrets must have the exact same names as those above.
 
 ### Add the Zillow Neighborhoods data file to the Databricks file system
 
@@ -225,7 +222,8 @@ For this section, you require the Log Analytics workspace ID and primary key. Th
     docker run -it --rm -v `pwd`:/streaming_azuredatabricks_azure -v ~/.m2:/root/.m2 maven:3.6.3-jdk-8 mvn -f /streaming_azuredatabricks_azure/pom.xml package
     ```
 
-1. Alternately, use your Java IDE to import the Maven project file named **pom.xml** located in the **data/streaming_azuredatabricks/azure** directory. Perform a clean build.
+    > Note: Alternately, use your Java IDE to import the Maven project file named **pom.xml** located in the **data/streaming_azuredatabricks/azure** directory. Perform a clean build.
+
 1. The outputs of the build are files named **azure-databricks-monitoring-0.9.jar** in the **./azure-databricks-monitoring/target** directory and **azure-databricks-job-1.0-SNAPSHOT.jar** in the **./AzureDataBricksJob/target** directory.
 
 ### Configure custom logging for the Databricks job
@@ -265,7 +263,7 @@ For this section, you require the Log Analytics workspace ID and primary key. Th
 
 9. Below the **Auto Termination** dialog box, click on **Advanced Options** then **Init Scripts**.
 
-10. Enter **dbfs:/databricks/init/{cluster-name}/spark-metrics.sh**, substituting the cluster name created in step 1 for **{cluster-name}**.
+10. Enter **dbfs:/databricks/init/\<cluster-name\>/spark-metrics.sh**, substituting the cluster name created in step 1 for **\<cluster-name\>**.
 
 11. Click the **Add** button.
 
@@ -307,10 +305,10 @@ For this section, you require the Log Analytics workspace ID and primary key. Th
 
 5. Enter **com.microsoft.pnp.TaxiCabReader** in the **Main Class** field.
 
-6. In the arguments field, enter the following (replace **{Cosmos DB Cassandra host name}** with a value from above):
+6. In the arguments field, enter the following (replace **\<Cosmos DB Cassandra host name\>** with a value from above):
 
     ```
-    -n jar:file:/dbfs/azure-databricks-jobs/ZillowNeighborhoods-NY.zip!/ZillowNeighborhoods-NY.shp --taxi-ride-consumer-group taxi-ride-eh-cg --taxi-fare-consumer-group taxi-fare-eh-cg --window-interval "1 minute" --cassandra-host {Cosmos DB Cassandra host name}
+    -n jar:file:/dbfs/azure-databricks-jobs/ZillowNeighborhoods-NY.zip!/ZillowNeighborhoods-NY.shp --taxi-ride-consumer-group taxi-ride-eh-cg --taxi-fare-consumer-group taxi-fare-eh-cg --window-interval "1 minute" --cassandra-host <Cosmos DB Cassandra host name>
     ```
 
 7. Click **OK**.
