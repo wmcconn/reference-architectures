@@ -37,10 +37,10 @@ Configuration Provision_OnPrem
 
         # Microsoft Integration Runtime
         $mirLogPath = Join-Path $logFilesFolder "mir_log.txt"
-        $mirDownloadUri = "https://download.microsoft.com/download/E/4/7/E4771905-1079-445B-8BF9-8A1A075D8A10/IntegrationRuntime_3.12.6897.1 (64-bit).msi"
+        $mirDownloadUri = "https://download.microsoft.com/download/E/4/7/E4771905-1079-445B-8BF9-8A1A075D8A10/IntegrationRuntime_4.7.7383.1.msi"
         $mirMsiPath = Join-Path $downloadsFolder "\MicrosoftIntegrationRuntime.msi"
         $mirInstallPath = "C:\Program Files\Microsoft Integration Runtime"
-        $mirRegistrationPath = Join-Path $mirInstallPath "3.0\PowerShellScript\RegisterIntegrationRuntime.ps1"
+        $mirRegistrationPath = Join-Path $mirInstallPath "4.0\PowerShellScript\RegisterIntegrationRuntime.ps1"
         $mirRegistrationArgumentList = @{gatewayKey=$IntegrationRuntimeGatewayKey}
 
         # Power BI Desktop

@@ -13,7 +13,7 @@
         },
         "apiVersion": {
             "type": "string",
-            "defaultValue": "2017-09-01-preview"
+            "defaultValue": "2018-06-01"
         }
     },
     "variables": {

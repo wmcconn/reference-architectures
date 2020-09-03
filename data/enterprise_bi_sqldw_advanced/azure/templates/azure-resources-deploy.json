@@ -24,7 +24,7 @@
         },
         "dwPerformanceTier": {
             "type": "string",
-            "defaultValue": "DW400",
+            "defaultValue": "DW400c",
             "metadata": {
                 "description": "Performance Tier"
                 }

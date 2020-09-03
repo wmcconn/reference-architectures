@@ -8,7 +8,7 @@ For more information about this reference architectures and guidance about best 
 
 The deployment uses [Azure Building Blocks](https://github.com/mspnp/template-building-blocks/wiki) (azbb), a command line tool that simplifies deployment of Azure resources.
 
-## Deploy the solution 
+## Deploy the solution
 
 ### Prerequisites
 
@@ -21,6 +21,10 @@ The deployment uses [Azure Building Blocks](https://github.com/mspnp/template-bu
    ```bash
    npm install -g @mspnp/azure-building-blocks
    ```
+   > Note: There is a limitation in version 2.2.3 which will cause an error when deploying into regions that return a large list of VM SKUs when queried.  A fix has been included via https://github.com/mspnp/template-building-blocks/pull/420.  You can get the latest version including this fix from the repo by doing:
+   > 1. `git clone git@github.com:mspnp/template-building-blocks.git`
+   > 1. `cd template-building-blocks`
+   > 1. `npm install -g .`
 
 4. From a command prompt, bash prompt, or PowerShell prompt, sign into your Azure account as follows:
 
@@ -46,10 +50,10 @@ The steps that follow include some user-defined variables. You will need to repl
 
 1. Navigate to the `data\enterprise_bi_sqldw_advanced\azure\templates` folder of the [GitHub repository][ref-arch-repo].
 
-2. Run the following Azure CLI command to create a resource group.  
+2. Run the following Azure CLI command to create a resource group.
 
     ```bash
-    az group create --name <resource_group_name> --location <region>  
+    az group create --name <resource_group_name> --location <region>
     ```
 
     Specify a region that supports SQL Data Warehouse, Azure Analysis Services, and Data Factory v2. See [Azure Products by Region](https://azure.microsoft.com/global-infrastructure/services/)
@@ -70,11 +74,11 @@ Next, use the Azure Portal to get the authentication key for the Azure Data Fact
 
     ![](./_images/adf-blade.png)
 
-3. In the Azure Data Factory portal, select the pencil icon ("Author"). 
+3. In the Azure Data Factory portal, select the briefcase icon (**Manage**).
 
-4. Click **Connections**, and then select **Integration Runtimes**.
+4. Under **Connections**, select **Integration Runtimes**.
 
-5. Under **sourceIntegrationRuntime**, click the pencil icon ("Edit").
+5. Select **sourceIntegrationRuntime**.
 
     > The portal will show the status as "unavailable". This is expected until you deploy the on-premises server.
 
@@ -111,7 +115,9 @@ This step deploys a VM as a simulated on-premises server, which includes SQL Ser
     azbb -s <subscription_id> -g <resource_group_name> -l <region> -p onprem.parameters.json --deploy
     ```
 
-This step may take 20 to 30 minutes to complete. It includes running a [DSC](https://docs.microsoft.com/azure/architecture/best-practices/naming-conventions#naming-rules-and-restrictions/powershell/dsc/overview) script to install the tools and restore the database. 
+This step may take 20 to 30 minutes to complete. It includes running a [DSC](https://docs.microsoft.com/azure/architecture/best-practices/naming-conventions#naming-rules-and-restrictions/powershell/dsc/overview) script to install the tools and restore the database.
+
+> Note: The template contains a network security group which allows inbound RDP access to the sql-vm1 virtual machine from the internet to support connecting in a later step.  You should edit the inbound rules on `ra-bi-onprem-nsg` to only allow connections from your network.
 
 ### Deploy Azure resources
 
@@ -125,22 +131,22 @@ This step provisions SQL Data Warehouse, Azure Analysis Services, and Data Facto
     az group deployment create --resource-group <resource_group_name> \
      --template-file azure-resources-deploy.json \
      --parameters "dwServerName"="<data_warehouse_server_name>" \
-     "dwAdminLogin"="adminuser" "dwAdminPassword"="<data_warehouse_password>" \ 
+     "dwAdminLogin"="adminuser" "dwAdminPassword"="<data_warehouse_password>" \
      "storageAccountName"="<storage_account_name>" \
      "analysisServerName"="<analysis_server_name>" \
      "analysisServerAdmin"="<user@contoso.com>"
     ```
 
-    - The `storageAccountName` parameter must follow the [naming rules](https://docs.microsoft.com/azure/architecture/best-practices/naming-conventions#naming-rules-and-restrictions) for Storage accounts. 
+    - The `storageAccountName` parameter must follow the [naming rules](https://docs.microsoft.com/azure/architecture/best-practices/naming-conventions#naming-rules-and-restrictions) for Storage accounts.
     - For the `analysisServerAdmin` parameter, use your Azure Active Directory user principal name (UPN).
 
 3. Run the following Azure CLI command to get the access key for the storage account. You will use this key in the next step.
 
     ```bash
-    az storage account keys list -n <storage_account_name> -g <resource_group_name> --query [0].value
+    az storage account keys list -n <storage_account_name> -g <resource_group_name> --query "[0].value"
     ```
 
-4. Run the following Azure CLI command. Replace the parameter values shown in angle brackets. 
+4. Run the following Azure CLI command. Replace the parameter values shown in angle brackets.
 
     ```bash
     az group deployment create --resource-group <resource_group_name> \
@@ -177,36 +183,21 @@ To verify this step, you can use SQL Server Management Studio (SSMS) to connect 
 
 ### Run the Data Factory pipeline
 
-1. From the same Remote Desktop session, open a PowerShell window.
+1. In the Azure Portal, navigate to the Data Factory instance that was created earlier.
 
-2. Run the following PowerShell command. Choose **Yes** when prompted.
-
-    ```powershell
-    Install-Module -Name AzureRM -AllowClobber
-    ```
-
-3. Run the following PowerShell command. Enter your Azure credentials when prompted.
-
-    ```powershell
-    Connect-AzureRmAccount 
-    ```
-
-4. Run the following PowerShell commands. Replace the values in angle brackets.
-
-    ```powershell
-    Set-AzureRmContext -SubscriptionId <subscription id>
-
-    Invoke-AzureRmDataFactoryV2Pipeline -DataFactory <data-factory-name> -PipelineName "MasterPipeline" -ResourceGroupName <resource_group_name>
-
-5. In the Azure Portal, navigate to the Data Factory instance that was created earlier.
-
-6. In the Data Factory blade, click **Author & Monitor**. This opens the Azure Data Factory portal in another browser window.
+1. In the Data Factory blade, click **Author & Monitor**. This opens the Azure Data Factory portal in another browser window.
 
     ![](./_images/adf-blade.png)
 
-7. In the Azure Data Factory portal, click the **Monitor** icon. 
+1. In the Azure Data Factory portal, select the pencil icon (**Author**).
 
-8. Verify that the pipeline completes successfully. It can take a few minutes.
+1. In the Author view, select Pipelines, MasterPipeline then select Add trigger, Trigger now.
+
+    ![](./_images/adf-pipeline-trigger.png)
+
+1. In the Azure Data Factory portal, select the gauge icon (**Monitor**).
+
+1. Verify that the pipeline completes successfully. It can take a few minutes.
 
     ![](./_images/adf-pipeline-progress.png)
 
@@ -221,11 +212,11 @@ In this step, you will create a tabular model that imports data from the data wa
 
 2. Select **File** > **New** > **Project**.
 
-3. In the **New Project** dialog, under **Templates**, select  **Business Intelligence** > **Analysis Services** > **Analysis Services Tabular Project**. 
+3. In the **New Project** dialog, under **Templates**, select  **Business Intelligence** > **Analysis Services** > **Analysis Services Tabular Project**.
 
 4. Name the project and click **OK**.
 
-5. In the **Tabular model designer** dialog, select **Integrated workspace**  and set **Compatibility level** to `SQL Server 2017 / Azure Analysis Services (1400)`. 
+5. In the **Tabular model designer** dialog, select **Integrated workspace**  and set **Compatibility level** to `SQL Server 2017 / Azure Analysis Services (1400)`.
 
 6. Click **OK**.
 
@@ -250,7 +241,7 @@ In this step, you will create a tabular model that imports data from the data wa
 
 1. In the model designer, select the **Fact Sale** table.
 
-2. Click a cell in the the measure grid. By default, the measure grid is displayed below the table. 
+2. Click a cell in the the measure grid. By default, the measure grid is displayed below the table.
 
     ![](./_images/tabular-model-measures.png)
 
@@ -264,11 +255,11 @@ In this step, you will create a tabular model that imports data from the data wa
 
     ```
     Number of Years:=(MAX('Fact CityPopulation'[YearNumber])-MIN('Fact CityPopulation'[YearNumber]))+1
-    
+
     Beginning Population:=CALCULATE(SUM('Fact CityPopulation'[Population]),FILTER('Fact CityPopulation','Fact CityPopulation'[YearNumber]=MIN('Fact CityPopulation'[YearNumber])))
-    
+
     Ending Population:=CALCULATE(SUM('Fact CityPopulation'[Population]),FILTER('Fact CityPopulation','Fact CityPopulation'[YearNumber]=MAX('Fact CityPopulation'[YearNumber])))
-    
+
     CAGR:=IFERROR((([Ending Population]/[Beginning Population])^(1/[Number of Years]))-1,0)
     ```
 
@@ -280,9 +271,9 @@ For more information about creating measures in SQL Server Data Tools, see [Meas
 
 1. In the **Tabular Model Explorer** window, right-click the project and select **Model View** > **Diagram View**.
 
-2. Drag the **[Fact Sale].[City Key]** field to the **[Dimension City].[City Key]** field to create a relationship.  
+2. Drag the **[Fact Sale].[City Key]** field to the **[Dimension City].[City Key]** field to create a relationship.
 
-3. Drag the **[Face CityPopulation].[City Key]** field to the **[Dimension City].[City Key]** field.  
+3. Drag the **[Face CityPopulation].[City Key]** field to the **[Dimension City].[City Key]** field.
 
     ![](./_images/analysis-services-relations-2.png)
 
@@ -290,7 +281,7 @@ For more information about creating measures in SQL Server Data Tools, see [Meas
 
 1. From the **File** menu, choose **Save All**.
 
-2. In **Solution Explorer**, right-click the project and select **Properties**. 
+2. In **Solution Explorer**, right-click the project and select **Properties**.
 
 3. Under **Server**, enter the URL of your Azure Analysis Services instance. You can get this value from the Azure Portal. In the portal, select the Analysis Services resource, click the Overview pane, and look for the **Server Name** property. It will be similar to `asazure://westus.asazure.windows.net/contoso`. Click **OK**.
 

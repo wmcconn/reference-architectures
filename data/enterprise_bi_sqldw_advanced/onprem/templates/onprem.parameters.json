@@ -23,6 +23,27 @@
                     ]
                 },
                 {
+                    "type": "NetworkSecurityGroup",
+                    "settings": [
+                        {
+                            "name": "ra-bi-onprem-nsg",
+                            "securityRules": [
+                                {
+                                    "name": "RDP"
+                                }
+                            ],
+                            "virtualNetworks": [
+                                {
+                                    "name": "ra-bi-onprem-vnet",
+                                    "subnets": [
+                                        "sql"
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
                     "type": "VirtualMachine",
                     "settings": {
                         "vmCount": 1,
@@ -105,7 +126,7 @@
                                 "autoUpgradeMinorVersion": true,
                                 "settings": {
                                     "configuration": {
-                                        "url": "https://github.com/mspnp/reference-architectures/blob/master/data/enterprise_bi_sqldw_advanced/onprem/dsc/Provision_OnPrem.ps1.zip?raw=true",
+                                        "url": "https://github.com/mspnp/reference-architectures/raw/master/data/enterprise_bi_sqldw_advanced/onprem/dsc/Provision_OnPrem.ps1.zip",
                                         "script": "Provision_OnPrem.ps1",
                                         "function": "Provision_OnPrem"
                                     }
